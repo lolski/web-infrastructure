@@ -1,12 +1,12 @@
 terraform {
   backend "gcs" {
-    bucket  = "vaticle-web-prod-terraform-state"
+    bucket  = "vaticle-engineers-terraform-state"
     prefix  = "terraform/nomad"
   }
 }
 
 provider "google" {
-  project = "vaticle-web-prod"
+  project = "vaticle-engineers"
   region  = "europe-west2"
   zone    = "europe-west2-b"
 }
@@ -20,6 +20,7 @@ resource "google_compute_firewall" "nomad_server_http_firewall" {
     ports    = ["4646"]
   }
 
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["nomad-server"]
 }
 
@@ -49,9 +50,11 @@ resource "google_compute_instance" "nomad_server" {
   name                      = "nomad-server"
   machine_type              = "n1-standard-2"
 
+  allow_stopping_for_update = true
+
   boot_disk {
     initialize_params {
-      image = "vaticle-web-prod/nomad-server-2c045b5b75bda2d726274cdbca3d4967708209b2"
+      image = "vaticle-engineers/nomad-server-c0e79363f2ad60058abfd037ee3065c4e9e096ef"
     }
     device_name = "boot"
   }
@@ -62,7 +65,7 @@ resource "google_compute_instance" "nomad_server" {
   }
 
   service_account {
-    email = "grabl-prod@vaticle-web-prod.iam.gserviceaccount.com"
+    email = "grabl-temporary2@vaticle-engineers.iam.gserviceaccount.com"
     scopes = [
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/monitoring",

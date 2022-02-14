@@ -57,7 +57,7 @@ EOF
 
 cat > /etc/systemd/system/vault.service << EOF
 [Unit]
-Description=Nomad Server
+Description=Vault
 Wants=network.target
 Requires=network-online.target $MOUNT_SCRIPT
 After=network-online.target $MOUNT_SCRIPT
@@ -101,3 +101,8 @@ vault kv put nomad/nomad-ca value=@nomad-ca.pem
 vault kv put nomad/nomad-ca-key value=@nomad-ca-key.pem
 vault secrets enable -path=dockerhub kv
 rm -f nomad-ca*
+
+
+export VAULT_ADDR=https://127.0.0.1:8200
+export VAULT_CACERT=/mnt/vault/vault.pem
+export VAULT_TOKEN=$(cat /mnt/vault/token)

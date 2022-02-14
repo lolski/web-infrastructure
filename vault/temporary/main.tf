@@ -20,6 +20,7 @@ resource "google_compute_firewall" "vault_api_firewall" {
     ports    = ["8200"]
   }
 
+  source_tags = ["nomad-server", "nomad-client"]
   target_tags = ["vault"]
 }
 
@@ -36,9 +37,11 @@ resource "google_compute_instance" "vault" {
   name                      = "vault"
   machine_type              = "n1-standard-2"
 
+  allow_stopping_for_update = true
+
   boot_disk {
     initialize_params {
-      image = "vaticle-engineers/vault-2c045b5b75bda2d726274cdbca3d4967708209b2"
+      image = "vaticle-engineers/vault-c0e79363f2ad60058abfd037ee3065c4e9e096ef"
     }
     device_name = "boot"
   }
@@ -48,9 +51,8 @@ resource "google_compute_instance" "vault" {
     device_name = "vault-additional"
   }
 
-  // TODO: create a service account grabl-temporary@vaticle-engineers.iam....
   service_account {
-    email = "grabl-prod@vaticle-web-prod.iam.gserviceaccount.com"
+    email = "grabl-temporary2@vaticle-engineers.iam.gserviceaccount.com"
     scopes = [
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/monitoring",

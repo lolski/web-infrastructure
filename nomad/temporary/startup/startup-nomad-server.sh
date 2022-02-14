@@ -2,6 +2,7 @@
 
 set -ex
 
+echo "CURRENT USER=$(whoami)"
 ROOT_FOLDER=/mnt/nomad-server
 sudo mkdir -p $ROOT_FOLDER
 sudo mkdir -p $ROOT_FOLDER/data
@@ -60,9 +61,6 @@ export VAULT_TOKEN=$(cat $ROOT_FOLDER/vault-token)
 vault kv get -format=json nomad/nomad-ca | jq -r '.data.value' | sudo tee "$ROOT_FOLDER/nomad-ca.pem" >/dev/null
 vault kv get -format=json nomad/nomad-ca-key | jq -r '.data.value' | sudo tee "$ROOT_FOLDER/nomad-ca-key.pem" >/dev/null
 
-gcloud compute scp --zone=europe-west2-b consul-server:/mnt/consul-server/consul-agent-ca.pem $ROOT_FOLDER/consul-ca.pem >/dev/null 2>&1
-gcloud compute scp --zone=europe-west2-b consul-server:/mnt/consul-server/token $ROOT_FOLDER/consul-token >/dev/null 2>&1
-
 cat > cfssl.json << EOF
 {
   "signing": {
@@ -107,17 +105,6 @@ vault {
   enabled = true
   address = "https://vault:8200"
   ca_file = "$ROOT_FOLDER/vault-ca.pem"
-}
-
-consul {
-  address = "consul-server:8500"
-  ca_file = "$ROOT_FOLDER/consul-ca.pem"
-  token   = "$(cat $ROOT_FOLDER/consul-token)"
-  server_service_name = "nomad-server"
-  client_service_name = "nomad-client"
-  auto_advertise      = true
-  server_auto_join    = true
-  client_auto_join    = true
 }
 EOF
 
