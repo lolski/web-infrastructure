@@ -38,6 +38,7 @@ resource "google_compute_instance" "vault" {
   machine_type              = "n1-standard-2"
 
   allow_stopping_for_update = true
+  desired_status = "TERMINATED"
 
   boot_disk {
     initialize_params {
